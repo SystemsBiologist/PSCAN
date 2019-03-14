@@ -1545,7 +1545,8 @@ setMethod("FindOutliersKM",
             box()
             cat("The following cells are considered as outlier cells:",which(object@cpart>K),"\n")
             print(which(object@cpart>K))
-            return(object)
+            LL= which(object@cpart>K)  
+            return(LL)
           }
         )
 
@@ -1675,7 +1676,8 @@ setMethod("FindOutliersMB",
             box()
             cat("The following cells are considered as outlier cells:",which(object@cpart>K),"\n")
             print(which(object@cpart>K))
-            return(object)
+            LL= which(object@cpart>K)  
+            return(LL)
           }
         )
 
