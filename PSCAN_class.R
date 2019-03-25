@@ -1039,9 +1039,10 @@ NoiseFiltering<-function(object,percentile,CV,GeneList,geneCol,FgeneCol,erccCol,
     axis( 2, 10^(-2:2), c("0.01", "0.1", "1", "10", "100" ), las=2 )
     abline( h=10^(-2:1), v=10^(-1:5), col="#D0D0D0", lwd=2 )
     # Plot the genes, use a different color if they are highly variable
-    points( meansG1ms, cv2G1ms, pch=20, cex=.2,col = ifelse( padj < .1, FgeneCol, geneCol ) )
+    points( meansG1ms, cv2G1ms, pch=20, cex=.2,col = geneCol )
+
     #highlight gene list from test
-    points( meansG1ms_test, cv2G1ms_test, pch=20, cex=.2)
+    points( meansG1ms_test, cv2G1ms_test, pch=20, cex=.2,col=FgeneCol)
     # Add the technical noise fit, as before
     xg <- 10^seq( -2, 6, length.out=1000 )
     lines( xg, (xi+a1)/xg + a0, col="red", lwd=5 )
@@ -1053,7 +1054,7 @@ NoiseFiltering<-function(object,percentile,CV,GeneList,geneCol,FgeneCol,erccCol,
     	points( meansERCC, cv2ERCC, pch=20, cex=2, col=erccCol) # Showing all the valied ERCCs
     }
     add_legend("topleft", legend=c("Noise curve","ERCC spike-ins","Genes above the noise line"), pch=c(15,20,20), 
-     col=c("red","blue","black"),horiz=TRUE, bty='n', cex=0.9)
+     col=c("red",erccCol,FgeneCol),horiz=TRUE, bty='n', cex=0.9)
 
     return (genes_test)
 }
