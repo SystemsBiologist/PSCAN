@@ -416,6 +416,9 @@ setMethod("MBclustheatmap",
           signature = "PSCANseq ",
           definition = function(object,hmethod){
             x <- object@fdata  
+		object@clusterpar$metric <- "pearson"
+ 		y <- clustfun(object@fdata,clustnr=20,bootnr=50,metric="pearson",do.gap=TRUE,SE.method="Tibs2001SEmax",SE.factor=.25,B.gap=50,cln=0,rseed=17000) 
+		object@distances <- as.matrix( y$di )
             part <- object@MBclusters$clusterid
             na <- c()
             j <- 0
@@ -613,7 +616,7 @@ setGeneric("plottsneMB", function(object,K) standardGeneric("plottsneMB"))
 setMethod("plottsneMB",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@MBtsne) == 0 ) stop("run comptsne before plottsne")
+            if ( length(object@MBtsne) == 0 ) stop("run comptsneMB before plottsne")
 		col=c("black","blue","green","red","yellow","gray")
             part <- object@MBclusters$clusterid
             plot(object@MBtsne,xlab="Dim 1",ylab="Dim 2",pch=20,cex=1.5,col="lightgrey",las=1)
@@ -628,7 +631,7 @@ setGeneric("plotMBLabelstSNE", function(object) standardGeneric("plotMBLabelstSN
 setMethod("plotMBLabelstSNE",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@tsne) == 0 ) stop("run comptsne before plotlabelstsne")
+            if ( length(object@MBtsne) == 0 ) stop("run comptsneMB before plotlabelstsne")
             Clusters<-object@MBclusters$clusterid
             ClustersFactor<- as.factor(Clusters)
             ClustersFactor<- gsub("1", "black", ClustersFactor)
@@ -713,7 +716,7 @@ VolcanoPlot<-function(object,Value,DEGs,fc,adj=FALSE){
     with(FC, points(FC[,7], -log10(FC[,8]), pch=20,cex=2, col="red"))
     with(sigFC, points(sigFC[,7], -log10(sigFC[,8]), pch=20,cex=2, col="blue"))
     with(sigFC, textxy(sigFC[,7], -log10(sigFC[,8]), labs=sigFC[,2], cex=.55,col="blue"))
-    add_legend("topleft", legend=c(paste0("DEGs (FC < ",fc," - FDR> ",Value,")"), paste0("DEGs (FC < ",fc," - FDR> ",Value,")"),paste0("DEGs (FC < ",fc," - FDR< ",Value,")")), pch=20, col=c("black", "red","blue"),horiz=TRUE, bty='n', cex=0.9)
+    add_legend("topleft", legend=c(paste0("DEGs (FC < ",fc," - FDR> ",Value,")"), paste0("DEGs (FC < ",fc," - FDR> ",Value,")"),paste0("DEGs (FC < ",fc," - FDR< ",Value,")")), pch=20, col=c("black", "red","blue"),horiz=TRUE, bty='n', cex=0.7)
 }
 
 
@@ -926,7 +929,7 @@ Networking<-function(data,FileName){
 	# Construct API request
 	genes <- data
 	repos <- GET(url = paste0(string_api_url,output_format,'/',method,'?identifiers=',
-                          paste(as.character(data$genes.name), collapse = "%0d"),"&", "species=",species))
+                          paste(as.character(data), collapse = "%0d"),"&", "species=",species))
       cat("Examine response components =",status_code(repos),"\t","200 means successful","\n")
 
 	y = repos$request$ url
@@ -1431,7 +1434,7 @@ setGeneric("FindOutliersKM", function(object,outminc=5,outlg=2,probthr=1e-3,thr=
 setMethod("FindOutliersKM",
           signature = "PSCANseq ",
           definition = function(object,outminc,outlg,probthr,thr,outdistquant) {
-            if ( length(object@kmeans$kpart) == 0 ) stop("run clustexp before findoutliers")
+            if ( length(object@kmeans$kpart) == 0 ) stop("run clustexp before FindOutliersKM")
             if ( ! is.numeric(outminc) ) stop("outminc has to be a non-negative integer") else if ( round(outminc) != outminc | outminc < 0 ) stop("outminc has to be a non-negative integer")
             if ( ! is.numeric(outlg) ) stop("outlg has to be a non-negative integer") else if ( round(outlg) != outlg | outlg < 0 ) stop("outlg has to be a non-negative integer")
             if ( ! is.numeric(probthr) ) stop("probthr has to be a number between 0 and 1") else if (  probthr < 0 | probthr > 1 ) stop("probthr has to be a number between 0 and 1")
@@ -1557,18 +1560,20 @@ setMethod("FindOutliersKM",
 
 
 
+
 setGeneric("FindOutliersMB", function(object,outminc=5,outlg=2,probthr=1e-3,thr=2**-(1:40),outdistquant=.75) standardGeneric("FindOutliersMB"))
 
 setMethod("FindOutliersMB",
           signature = "PSCANseq ",
           definition = function(object,outminc,outlg,probthr,thr,outdistquant) {
-            if ( length(object@MBclusters$clusterid) == 0 ) stop("run clustexp before findoutliers")
+            if ( length(object@MBclusters$clusterid) == 0 ) stop("run exprmclust before FindOutliersMB")
             if ( ! is.numeric(outminc) ) stop("outminc has to be a non-negative integer") else if ( round(outminc) != outminc | outminc < 0 ) stop("outminc has to be a non-negative integer")
             if ( ! is.numeric(outlg) ) stop("outlg has to be a non-negative integer") else if ( round(outlg) != outlg | outlg < 0 ) stop("outlg has to be a non-negative integer")
             if ( ! is.numeric(probthr) ) stop("probthr has to be a number between 0 and 1") else if (  probthr < 0 | probthr > 1 ) stop("probthr has to be a number between 0 and 1")
             if ( ! is.numeric(thr) ) stop("thr hast to be a vector of numbers between 0 and 1") else if ( min(thr) < 0 | max(thr) > 1 ) stop("thr hast to be a vector of numbers between 0 and 1")
             if ( ! is.numeric(outdistquant) ) stop("outdistquant has to be a number between 0 and 1") else if (  outdistquant < 0 | outdistquant > 1 ) stop("outdistquant has to be a number between 0 and 1")
-                      
+            y <- clustfun(object@fdata,clustnr=20,bootnr=50,metric="pearson",do.gap=TRUE,SE.method="Tibs2001SEmax",SE.factor=.25,B.gap=50,cln=0,rseed=17000) 
+            object@distances <- as.matrix( y$di )
             object@outlierpar <- list( outminc=outminc,outlg=outlg,probthr=probthr,thr=thr,outdistquant=outdistquant )
             ### calibrate background model
             m <- log2(apply(object@fdata,1,mean))
@@ -1681,8 +1686,6 @@ setMethod("FindOutliersMB",
             return(LL)
           }
         )
-
-
 
 binompval <- function(p,N,n){
   pval   <- pbinom(n,round(N,0),p,lower.tail=TRUE)
