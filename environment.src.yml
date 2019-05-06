@@ -1,0 +1,48 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - r==3.5.*
+  - r-irkernel
+  - r-tsne
+  - r-pheatmap
+  - r-mass
+  - r-cluster
+  - r-mclust
+  - r-flexmix
+  - r-lattice
+  - r-fpc
+  - r-amap
+  - r-rcolorbrewer
+  - r-locfit
+  - bioconductor-tscan
+  - bioconductor-genefilter
+  - r-statmod
+  - r-ggplot2
+  - r-gplots
+  - bioconductor-deseq2
+  - r-matrixstats
+  - r-robustbase
+  # not in conda-forge, added via postBuild
+  # - r-philentropy
+  - r-igraph
+  - r-boot
+  - bioconductor-scde
+  - bioconductor-biomart
+  - r-tidyr
+  - r-calibrate
+  - r-partykit
+
+  - r-rweka
+  - r-rpart
+  - r-rpart.plot
+  # not in conda-forge, skipped
+  # - bioconductor-imager
+  - r-png
+  # not in conda-forge, added via postBuild
+  # - r-netindices
+  - r-httr
+  - r-jsonlite
+  - r-tidyverse
+  - r-samr
