@@ -241,7 +241,7 @@ setGeneric("plotKmeansLabelstSNE", function(object) standardGeneric("plotKmeansL
 setMethod("plotKmeansLabelstSNE",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@tsne) == 0 ) stop("run comptsne before plotlabelstsne")
+            if ( length(object@tsne) == 0 ) stop("run comptsne before plotKmeansLabelstSNE")
             Clusters<-object@kmeans$kpart
             ClustersFactor<- as.factor(Clusters)
             ClustersFactor<- gsub("1", "black", ClustersFactor)
@@ -264,7 +264,7 @@ setMethod("plotSymbolstSNE",
           signature = "PSCANseq ",
           definition = function(object,types){
             if ( is.null(types) ) types <- names(object@fdata)
-            if ( length(object@tsne) == 0 ) stop("run comptsne before plotsymbolstsne")
+            if ( length(object@tsne) == 0 ) stop("run comptsne before plotSymbolstSNE")
             if ( length(types) != ncol(object@fdata) ) stop("types argument has wrong length. Length has to equal to the column number of object@ndata")
             coloc <- rainbow(length(unique(types)))
             syms <- c()
@@ -280,6 +280,19 @@ setMethod("plotSymbolstSNE",
 
 
 
+PCAplotSymbols= function(object1,object2,types=NULL){
+	types <- names(object2)
+	types<- gsub("_[0-9]+","",types)
+	coloc <- rainbow(length(unique(types)))
+	syms<-c()
+	plot(object1[,1],object1[,2],xlab="PCA 1",ylab="PCA 2",pch=20,cex=0,col="grey",las=1)
+    for ( i in 1:length(unique(types)) ){
+		f <- types == sort(unique(types))[i]
+        syms <- append( syms, ( (i-1) %% 25 ) + 1 )
+		points(object1[f,1],object1[f,2],col=coloc[i],pch=( (i-1) %% 25 ) + 1,cex=1)
+        }
+    legend("topright", legend=sort(unique(types)), col=coloc, pch=syms)
+}       
 
 
 
@@ -416,6 +429,9 @@ setMethod("MBclustheatmap",
           signature = "PSCANseq ",
           definition = function(object,hmethod){
             x <- object@fdata  
+		object@clusterpar$metric <- "pearson"
+ 		y <- clustfun(object@fdata,clustnr=20,bootnr=50,metric="pearson",do.gap=TRUE,SE.method="Tibs2001SEmax",SE.factor=.25,B.gap=50,cln=0,rseed=17000) 
+		object@distances <- as.matrix( y$di )
             part <- object@MBclusters$clusterid
             na <- c()
             j <- 0
@@ -477,7 +493,7 @@ setGeneric("plotExptSNE", function(object,g,n="") standardGeneric("plotExptSNE")
 setMethod("plotExptSNE",
           signature = "PSCANseq ",
           definition = function(object,g,n=""){
-            if ( length(object@tsne) == 0 ) stop("run comptsne before plottsne")
+            if ( length(object@tsne) == 0 ) stop("run comptsne before plotExptSNE")
             if ( length(intersect(g,rownames(object@ndata))) < length(unique(g)) ) stop("second argument does not correspond to set of rownames slot ndata of SCseq object")
             if ( n == "" ) n <- g[1]
             l <- apply(object@ndata[g,] - .1,2,sum) + .1
@@ -613,7 +629,7 @@ setGeneric("plottsneMB", function(object,K) standardGeneric("plottsneMB"))
 setMethod("plottsneMB",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@MBtsne) == 0 ) stop("run comptsne before plottsne")
+            if ( length(object@MBtsne) == 0 ) stop("run comptsneMB before plottsneMB")
 		col=c("black","blue","green","red","yellow","gray")
             part <- object@MBclusters$clusterid
             plot(object@MBtsne,xlab="Dim 1",ylab="Dim 2",pch=20,cex=1.5,col="lightgrey",las=1)
@@ -628,7 +644,7 @@ setGeneric("plotMBLabelstSNE", function(object) standardGeneric("plotMBLabelstSN
 setMethod("plotMBLabelstSNE",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@tsne) == 0 ) stop("run comptsne before plotlabelstsne")
+            if ( length(object@MBtsne) == 0 ) stop("run comptsneMB before plotMBLabelstSNE")
             Clusters<-object@MBclusters$clusterid
             ClustersFactor<- as.factor(Clusters)
             ClustersFactor<- gsub("1", "black", ClustersFactor)
@@ -652,7 +668,7 @@ setGeneric("plotsilhouetteMB", function(object,K) standardGeneric("plotsilhouett
 setMethod("plotsilhouetteMB",
           signature = "PSCANseq ",
           definition = function(object){
-            if ( length(object@MBclusters$clusterid) == 0 ) stop("run clustexp before plotsilhouette")
+            if ( length(object@MBclusters$clusterid) == 0 ) stop("run exprmclust before plotsilhouetteMB")
             if ( length(unique(object@MBclusters$clusterid)) < 2 ) stop("only a single cluster: no silhouette plot")
 		col=c("black","blue","green","red","yellow","gray")
             kpart <- object@MBclusters$clusterid
@@ -667,7 +683,7 @@ setGeneric("plotexptsneMB", function(object,g,n="") standardGeneric("plotexptsne
 setMethod("plotexptsneMB",
           signature = "PSCANseq ",
           definition = function(object,g,n=""){
-            if ( length(object@MBtsne) == 0 ) stop("run comptsne before plottsne")
+            if ( length(object@MBtsne) == 0 ) stop("run comptsneMB before plotexptsneMB")
             if ( length(intersect(g,rownames(object@ndata))) < length(unique(g)) ) stop("second argument does not correspond to set of rownames slot ndata of SCseq object")
             if ( n == "" ) n <- g[1]
             l <- apply(object@ndata[g,] - .1,2,sum) + .1
@@ -713,7 +729,7 @@ VolcanoPlot<-function(object,Value,DEGs,fc,adj=FALSE){
     with(FC, points(FC[,7], -log10(FC[,8]), pch=20,cex=2, col="red"))
     with(sigFC, points(sigFC[,7], -log10(sigFC[,8]), pch=20,cex=2, col="blue"))
     with(sigFC, textxy(sigFC[,7], -log10(sigFC[,8]), labs=sigFC[,2], cex=.55,col="blue"))
-    add_legend("topleft", legend=c(paste0("DEGs (FC < ",fc," - FDR> ",Value,")"), paste0("DEGs (FC < ",fc," - FDR> ",Value,")"),paste0("DEGs (FC < ",fc," - FDR< ",Value,")")), pch=20, col=c("black", "red","blue"),horiz=TRUE, bty='n', cex=0.9)
+    add_legend("topleft", legend=c(paste0("DEGs (FC < ",fc," - FDR> ",Value,")"), paste0("DEGs (FC < ",fc," - FDR> ",Value,")"),paste0("DEGs (FC < ",fc," - FDR< ",Value,")")), pch=20, col=c("black", "red","blue"),horiz=TRUE, bty='n', cex=0.7)
 }
 
 
@@ -926,7 +942,7 @@ Networking<-function(data,FileName){
 	# Construct API request
 	genes <- data
 	repos <- GET(url = paste0(string_api_url,output_format,'/',method,'?identifiers=',
-                          paste(as.character(data$genes.name), collapse = "%0d"),"&", "species=",species))
+                          paste(as.character(data), collapse = "%0d"),"&", "species=",species))
       cat("Examine response components =",status_code(repos),"\t","200 means successful","\n")
 
 	y = repos$request$ url
@@ -964,6 +980,7 @@ NetAnalysis<-function(object){
     cat("Average Path Length",average.path.length(gg),"\n","\n")
     return(AnalysisTable)    
 }
+
 
 
 
@@ -1032,16 +1049,18 @@ NoiseFiltering<-function(object,percentile,CV,GeneList,geneCol,FgeneCol,erccCol,
     p <- 1 - pchisq( varsG1ms * (m-1) / testDenom, m-1 )
     p <- subset(p, !is.nan(p))
 
-    padj <- p.adjust( p, "BH" )                        #Adjust for multiple testing with the Benjamini-Hochberg method, cut at 10%
+    padj <- p.adjust( p, "BH" )       #Adjust for multiple testing with the Benjamini-Hochberg method, cut at 10%
     plot( NULL, xaxt="n", yaxt="n",log="xy", xlim = c( 1e-1, 3e5 ), ylim = c( .005, 100 ),main="Gene filtration by accounting for technical noise",
     xlab = "Average normalized read count", ylab = "Squared coefficient of variation (CV^2)" )
     axis( 1, 10^(-1:5), c("0.1", "1", "10", "100", "1000", expression(10^4), expression(10^5) ) )
     axis( 2, 10^(-2:2), c("0.01", "0.1", "1", "10", "100" ), las=2 )
     abline( h=10^(-2:1), v=10^(-1:5), col="#D0D0D0", lwd=2 )
     # Plot the genes, use a different color if they are highly variable
-    points( meansG1ms, cv2G1ms, pch=20, cex=.2,col = ifelse( padj < .1, FgeneCol, geneCol ) )
+    points( meansG1ms, cv2G1ms, pch=20, cex=.2,col = geneCol )
+
     #highlight gene list from test
-    points( meansG1ms_test, cv2G1ms_test, pch=20, cex=.2)
+	 points( meansG1ms_test, cv2G1ms_test, pch=20, cex=.22,col= FgeneCol)
+
     # Add the technical noise fit, as before
     xg <- 10^seq( -2, 6, length.out=1000 )
     lines( xg, (xi+a1)/xg + a0, col="red", lwd=5 )
@@ -1053,13 +1072,10 @@ NoiseFiltering<-function(object,percentile,CV,GeneList,geneCol,FgeneCol,erccCol,
     	points( meansERCC, cv2ERCC, pch=20, cex=2, col=erccCol) # Showing all the valied ERCCs
     }
     add_legend("topleft", legend=c("Noise curve","ERCC spike-ins","Genes above the noise line"), pch=c(15,20,20), 
-     col=c("red","blue","black"),horiz=TRUE, bty='n', cex=0.9)
+     col=c("red",erccCol,FgeneCol),horiz=TRUE, bty='n', cex=0.7)
 
     return (genes_test)
 }
-
-
-
 
 
 
@@ -1430,7 +1446,7 @@ setGeneric("FindOutliersKM", function(object,outminc=5,outlg=2,probthr=1e-3,thr=
 setMethod("FindOutliersKM",
           signature = "PSCANseq ",
           definition = function(object,outminc,outlg,probthr,thr,outdistquant) {
-            if ( length(object@kmeans$kpart) == 0 ) stop("run clustexp before findoutliers")
+            if ( length(object@kmeans$kpart) == 0 ) stop("run clustexp before FindOutliersKM")
             if ( ! is.numeric(outminc) ) stop("outminc has to be a non-negative integer") else if ( round(outminc) != outminc | outminc < 0 ) stop("outminc has to be a non-negative integer")
             if ( ! is.numeric(outlg) ) stop("outlg has to be a non-negative integer") else if ( round(outlg) != outlg | outlg < 0 ) stop("outlg has to be a non-negative integer")
             if ( ! is.numeric(probthr) ) stop("probthr has to be a number between 0 and 1") else if (  probthr < 0 | probthr > 1 ) stop("probthr has to be a number between 0 and 1")
@@ -1556,20 +1572,22 @@ setMethod("FindOutliersKM",
 
 
 
+
 setGeneric("FindOutliersMB", function(object,outminc=5,outlg=2,probthr=1e-3,thr=2**-(1:40),outdistquant=.75) standardGeneric("FindOutliersMB"))
 
 setMethod("FindOutliersMB",
           signature = "PSCANseq ",
           definition = function(object,outminc,outlg,probthr,thr,outdistquant) {
-            if ( length(object@MBclusters$clusterid) == 0 ) stop("run clustexp before findoutliers")
+            if ( length(object@MBclusters$clusterid) == 0 ) stop("run exprmclust before FindOutliersMB")
             if ( ! is.numeric(outminc) ) stop("outminc has to be a non-negative integer") else if ( round(outminc) != outminc | outminc < 0 ) stop("outminc has to be a non-negative integer")
             if ( ! is.numeric(outlg) ) stop("outlg has to be a non-negative integer") else if ( round(outlg) != outlg | outlg < 0 ) stop("outlg has to be a non-negative integer")
             if ( ! is.numeric(probthr) ) stop("probthr has to be a number between 0 and 1") else if (  probthr < 0 | probthr > 1 ) stop("probthr has to be a number between 0 and 1")
             if ( ! is.numeric(thr) ) stop("thr hast to be a vector of numbers between 0 and 1") else if ( min(thr) < 0 | max(thr) > 1 ) stop("thr hast to be a vector of numbers between 0 and 1")
             if ( ! is.numeric(outdistquant) ) stop("outdistquant has to be a number between 0 and 1") else if (  outdistquant < 0 | outdistquant > 1 ) stop("outdistquant has to be a number between 0 and 1")
-                      
-            object@outlierpar <- list( outminc=outminc,outlg=outlg,probthr=probthr,thr=thr,outdistquant=outdistquant )
-            ### calibrate background model
+            object<- Clustexp(object, clustnr=20,bootnr=50,metric="pearson",do.gap=T,SE.method="Tibs2001SEmax",SE.factor=.25,B.gap=50,cln=K,rseed=17000)
+			object@outlierpar <- list( outminc=outminc,outlg=outlg,probthr=probthr,thr=thr,outdistquant=outdistquant )
+            
+			### calibrate background model
             m <- log2(apply(object@fdata,1,mean))
             v <- log2(apply(object@fdata,1,var))
             f <- m > -Inf & v > -Inf
@@ -1680,8 +1698,6 @@ setMethod("FindOutliersMB",
             return(LL)
           }
         )
-
-
 
 binompval <- function(p,N,n){
   pval   <- pbinom(n,round(N,0),p,lower.tail=TRUE)
@@ -1863,5 +1879,17 @@ setMethod("KMClustDiffGenes",
           }
           )
 
+
+
+
+
+
+
+
+
+estimateSizeFactorsForMatrix = function (counts, locfunc = median){
+	loggeomeans <- rowMeans(log(counts))
+	apply(counts, 2, function(cnts) exp(locfunc((log(cnts) - loggeomeans)[is.finite(loggeomeans)])))
+}
 
 
