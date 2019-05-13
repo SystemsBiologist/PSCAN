@@ -541,7 +541,7 @@ Plotmclust <- function(mclustobj, x = 1, y = 2, MSTorder = NULL, show_tree = T, 
                   g <- g + geom_point(na.rm = TRUE,color="green")
             }
       } else {
-            g <- ggplot(data = edge_df, aes(x = pca_dim_1, y = pca_dim_2))
+            g <- ggplot(data = edge_df, aes(x = PC1, y = PC2))
             if (showcluster) {
                   g <- g + geom_point(aes_string(color = color_by), na.rm = TRUE, size = 3)
                     g <- g +scale_colour_manual(values = c("1"="black","2"="blue","3"="green","4"="red","5"="yellow","6"="gray"))
@@ -593,7 +593,7 @@ Plotmclust <- function(mclustobj, x = 1, y = 2, MSTorder = NULL, show_tree = T, 
             
       }            
       g <- g + guides(colour = guide_legend(override.aes = list(size=5))) + 
-            xlab(paste0("PCA_dimension_",x)) + ylab(paste0("PCA_dimension_",y)) +
+            xlab(paste0("PC1")) + ylab(paste0("PC2")) +
             theme(panel.border = element_blank(), axis.line = element_line()) + 
             theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank()) + 
             theme(panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank()) + 
@@ -721,7 +721,7 @@ add_legend <- function(...) {
 }
 
 
-VolcanoPlot<-function(object,Value,DEGs,fc,adj=FALSE,FS=.04){
+VolcanoPlot<-function(object,Value,DEGs,fc,adj=FALSE,FS=.4){
     if (length(object[1,])>8) {object<-object[,-1]}
     object[,8] <- if ( adj ) object[,8]+0.00000000001 else object[,8]
     with(object, plot(object[,7], -log10(object[,8]), pch=20,cex=2, las=1,xlab="log2 Fold Change",ylab="-log10 FDR",sub=paste0("Volcano plot ",DEGs),font.sub=4,col.sub="black"))
