@@ -410,7 +410,7 @@ PlotMBorderPCA<- function(object) {
     v <- round((l - mi)/(ma - mi)*99 + 1,0)
     layout(matrix(data=c(1,3,2,4), nrow=2, ncol=2), widths=c(5,1,5,1), heights=c(5,1,1,1))
     par(mar = c(5,5,2.5,2))
-    plot(object[,1],object[,2],xlab="PCA 1",ylab="PCA 2",pch=20,cex=0,col="grey",las=1)
+    plot(object[,1],object[,2],xlab="PC1",ylab="PC2",pch=20,cex=0,col="grey",las=1)
     for ( k in 1:length(v) ){
         points(object[k,1],object[k,2],col=ColorRamp[v[k]],pch=20,cex=2)
     }
@@ -541,7 +541,7 @@ Plotmclust <- function(mclustobj, x = 1, y = 2, MSTorder = NULL, show_tree = T, 
                   g <- g + geom_point(na.rm = TRUE,color="green")
             }
       } else {
-            g <- ggplot(data = edge_df, aes(x = PC1, y = PC2))
+            g <- ggplot(data = edge_df, aes(x = pca_dim_1, y = pca_dim_2))
             if (showcluster) {
                   g <- g + geom_point(aes_string(color = color_by), na.rm = TRUE, size = 3)
                     g <- g +scale_colour_manual(values = c("1"="black","2"="blue","3"="green","4"="red","5"="yellow","6"="gray"))
@@ -593,7 +593,7 @@ Plotmclust <- function(mclustobj, x = 1, y = 2, MSTorder = NULL, show_tree = T, 
             
       }            
       g <- g + guides(colour = guide_legend(override.aes = list(size=5))) + 
-            xlab(paste0("PC1")) + ylab(paste0("PC2")) +
+            xlab(paste0("PCA_dimension_",x)) + ylab(paste0("PCA_dimension_",y)) +
             theme(panel.border = element_blank(), axis.line = element_line()) + 
             theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank()) + 
             theme(panel.grid.major.x = element_blank(), panel.grid.major.y = element_blank()) + 
