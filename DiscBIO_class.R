@@ -285,7 +285,7 @@ PCAplotSymbols= function(object1,object2,types=NULL){
 	types<- gsub("_[0-9]+","",types)
 	coloc <- rainbow(length(unique(types)))
 	syms<-c()
-	plot(object1[,1],object1[,2],xlab="PCA 1",ylab="PCA 2",pch=20,cex=0,col="grey",las=1)
+	plot(object1[,1],object1[,2],xlab="PC1",ylab="PC2",pch=20,cex=0,col="grey",las=1)
     for ( i in 1:length(unique(types)) ){
 		f <- types == sort(unique(types))[i]
         syms <- append( syms, ( (i-1) %% 25 ) + 1 )
