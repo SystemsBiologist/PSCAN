@@ -2,6 +2,8 @@ channels:
   - conda-forge
   - bioconda
   - defaults
+  # preserve broken channel for
+  - conda-forge/label/broken
 dependencies:
   - r==3.5.*
   - r-irkernel
@@ -32,6 +34,7 @@ dependencies:
   - bioconductor-biomart
   - r-tidyr
   - r-calibrate
+  - r-encrichr
   - r-partykit
 
   - r-rweka
