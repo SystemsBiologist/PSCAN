@@ -11,6 +11,8 @@ Try it with Binder:
 
 
 In case the user would like to run the notebook using Jupyter, this code should be run first:
+
+```R
 source("https://bioconductor.org/biocLite.R")
 biocLite(c("pheatmap","MASS","cluster","mclust","flexmix","lattice","fpc",
                 "amap", "RColorBrewer","locfit","TSCAN","genefilter","statmod",
@@ -18,3 +20,4 @@ biocLite(c("pheatmap","MASS","cluster","mclust","flexmix","lattice","fpc",
                 "igraph","boot","biomaRt","tidyr","calibrate","partykit","RWeka",
                 "rpart","rpart.plot","imager","png","NetIndices","httr","jsonlite","tidyverse",
                 "samr","tidyverse"))
+```
