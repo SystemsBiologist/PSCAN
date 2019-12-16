@@ -15,9 +15,10 @@ In case the user would like to run the notebook using Jupyter, this code should 
 ```R
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-BiocManager::install(c(""pheatmap","MASS","cluster","mclust","flexmix","lattice","fpc",
-                "amap", "RColorBrewer","locfit","TSCAN","genefilter","statmod",
-                "ggplot2","gplots","DESeq2","matrixStats","robustbase","philentropy",
-                "igraph","boot","biomaRt","tidyr","calibrate","partykit","RWeka",
-                "rpart","rpart.plot","imager","png","NetIndices","httr","jsonlite","tidyverse",
-                "samr","tidyverse"))
+BiocManager::install(c("pheatmap", "MASS", "cluster", "mclust", "flexmix",
+    "lattice", "fpc", "amap", "RColorBrewer", "locfit", "TSCAN", "genefilter",
+    "statmod", "ggplot2", "gplots", "DESeq2", "matrixStats", "robustbase",
+    "philentropy", "igraph", "boot", "biomaRt", "tidyr", "calibrate", "partykit",
+    "RWeka", "rpart", "rpart.plot", "imager", "png", "NetIndices", "httr",
+    "jsonlite", "samr", "tidyverse"))
+```
