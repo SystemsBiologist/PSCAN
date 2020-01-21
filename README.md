@@ -20,4 +20,4 @@ BiocManager::install(c(""pheatmap","MASS","cluster","mclust","flexmix","lattice"
                 "ggplot2","gplots","DESeq2","matrixStats","robustbase","philentropy",
                 "igraph","boot","biomaRt","tidyr","calibrate","partykit","RWeka",
                 "rpart","rpart.plot","imager","png","NetIndices","httr","jsonlite","tidyverse",
-                "samr","tidyverse"))
+                "samr","tidyverse","enrichR"))
